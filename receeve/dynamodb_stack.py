@@ -63,11 +63,11 @@ class DynamoDBWithBackupStack(Stack):
         # grant permission to lambda to read from demo table
         demo_table.grant_read_data(backup_lambda)
 
-        # create a Cloudwatch Event rule
-        one_minute_rule = aws_events.Rule(
-            self, "one_minute_rule",
-            schedule=aws_events.Schedule.rate(Duration.minutes(1)),
+        # create a Cloudwatch Event rule - everyday at 2:00 AM UTC time
+        event_rule = aws_events.Rule(
+            self, "everyday_at_2_00_AM_UTC",
+            schedule=aws_events.Schedule.expression('cron(0 2 * * ? *)'),
         )
 
         # Add target to Cloudwatch Event
-        one_minute_rule.add_target(aws_events_targets.LambdaFunction(backup_lambda))
+        event_rule.add_target(aws_events_targets.LambdaFunction(backup_lambda))
